@@ -1,0 +1,39 @@
+import numpy as np
+
+class Lotka_Volterra_model: 
+    def __init__(self):
+        h = 0.01        #крок                           
+        self.t_points = np.arange(0, 20, h)         
+        self.x_points, self.y_points  = [], []    
+        x_y = np.array([2, 2], float)   #початкове число лисиць і зайців = 2
+        
+        for t in self.t_points:
+            self.x_points.append(x_y[0])          
+            self.y_points.append(x_y[1])         
+            x_y += self.runge_kutta_method(x_y, t, h)
+            
+    def runge_kutta_method(self, x_y, t, h):        
+        k_1 = h * self.f(x_y, t)
+        k_2 = h * self.f(x_y + 0.5 * k_1, t + 0.5 * h)
+        k_3 = h * self.f(x_y + 0.5 * k_2, t + 0.5 * h)
+        k_4 = h * self.f(x_y + k_3, t + h)
+        
+        return (k_1 + 2 * k_2 + 2 * k_3 + k_4) / 6
+
+    def f(self, x_y, t):
+        alpha = 1.0     #ймовірність того, що травоїдні розмножаться
+        beta = 0.5      #ймовірність того, що травоїдна буде з'їдена хижаком
+        gamma = 0.5     #ймовірність того, що хижак помре від голоду
+        delta = 2.0     #ймовірність того, що хижакові вистачить їжі на подальше розмноження
+        x, y = x_y[0], x_y[1]
+        
+        dx_dt = (alpha - beta * y) * x
+        dy_dt = (-gamma + delta * x) * y
+        
+        return np.array([dx_dt, dy_dt], float)
+
+    def show(self):
+        print("show")   #будуємо графік
+        
+model = Lotka_Volterra_model()
+model.show()
