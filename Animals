@@ -1,0 +1,55 @@
+import random
+
+class Fox:
+  def __init__(self, health: int, satiety: int, genetic: int):
+    self.health = health + genetic * 10
+    self.satiety = satiety + genetic * 10
+  
+  def ready_to_reproduce(self):
+    if self.health > 90:
+      if random.random() > 0.5:
+        new_fox = Fox(100)
+        Animals.append(new_fox)
+  
+  def is_hungry(self):
+    if self.satiety == 0:
+      self.health -= 2
+
+  def get_info(self):
+    print(f"This fox: {self.health}, {self.satiety}")
+
+class Rabbit:
+  def __init__(self, health: int, satiety: int, genetic: int):
+    self.health = health + genetic * 10
+    self.satiety = satiety + genetic * 10
+
+  def ready_to_reproduce(self):
+    if self.health > 90:
+      if random.random() > 0.5:
+        new_rabbit = Rabbit(100)
+        Animals.append(new_rabbit)
+
+  def is_hungry(self):
+    if self.satiety == 0:
+      self.health -= 2      
+
+  def get_info(self):
+    print(f"This rabbit: {self.health}, {self.satiety}")
+
+class Plant:
+  def __init__(self, maturity: int, has_thorns: bool):
+    self.maturity = maturity
+    self.has_thorns = has_thorns
+
+Animals = []
+Animals.append(Fox(100, 100, 2))
+Animals.append(Rabbit(100, 80, 1))
+Animals.append(Rabbit(70, 100, 2))
+Animals.append(Fox(100, 100, 1))
+Animals.append(Fox(100, 80, 1))
+Animals.append(Rabbit(90, 100, 3))
+Animals.append(Fox(100, 100, 1))
+
+for i in Animals:
+  print(i.get_info())
+print(len(Animals))
