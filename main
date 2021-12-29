@@ -1,54 +1,24 @@
-import animals
-import random
+def one():#будущие фунции
+    print("one")
 
-Predators = []
-Preys = []
+def two():
+    print("two")
 
-def start_game(): #початок гри
-  add_predator()
-  add_prey()
+def three():
+    print("three")
 
-  print("Done")
-
-def add_prey(): #додавання здобичі
-    preys = int(input("Choose amount of preys:"))
-
-    for i in range(preys):
-      new_prey = animals.Rabbit(random.randint(10, 50), random.randint(10, 50), random.randint(1, 10))
-      Preys.append(new_prey)
-
-    print("Done")
-
-def add_predator(): #додавання хижака
-    predators = int(input("Choose amount of predators:"))
-
-    for i in range(predators):
-      new_predator = animals.Fox(random.randint(10, 100), random.randint(10, 100), random.randint(1, 10))
-      Predators.append(new_predator)
-
-    print("Done")
-
-def view():
-  print("   List of all entities","Predators: ",sep = '\n')
-  for i in range(len(Predators)):
-    print("predator",i," ", Predators[i].health," ",Predators[i].satiety)
-  print("Prey: ")
-  for i in range(len(Preys)):
-    print("prey",i," ", Preys[i].health," ",Preys[i].satiety)
-  print("")
-
-
-
+def four():
+    print("four")
 #Клас меню
 class Menu():
 
     options = []
 
     def __init__(self):
-        self.options = ["Start game","Add predator","Add prey","View", "Exit"]
+        self.options = ["One","Two","Three","Four"]
 
     def print_header(self):
-        print ("Please Select An Option")
+        print (" Please Select An Option")
 
     def print_mainMenu(self):
         self.print_header()
@@ -62,20 +32,16 @@ class Menu():
         return input("Select Option: ")
 
     def handle_input(self, chosen_option):
-          if(chosen_option == '1'):
-              start_game()
-          elif(chosen_option == '2'):
-              add_predator()
-          elif(chosen_option == '3'):
-              add_prey()
-          elif(chosen_option == '4'):
-              view()
-          elif(chosen_option == '5'):
-              return None
-          else:
-              print("Wrong option")
-          self.print_mainMenu()
-          self.handle_input(self.prompt())
+        if(chosen_option == '1'):
+            one()
+        elif(chosen_option == '2'):
+            two()
+        elif(chosen_option == '3'):
+            three()
+        elif(chosen_option == '4'):
+            four()
+        else:
+            print("Wrong option")
 
 
 def main():
