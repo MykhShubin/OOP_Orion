@@ -1,55 +1,247 @@
 import random
+import pygame as pg
+import math
 
-class Fox:
-  def __init__(self, health: int, satiety: int, genetic: int):
-    self.health = health + genetic * 10
-    self.satiety = satiety + genetic * 10
+
+def to_radians(degrees):
+    return degrees * (math.pi / 180)
+
+def to_degrees(radians):
+    return (180 * radians) / math.pi
+
+def find_angel(x1, y1, x2, y2):
+    dx = x2 - x1
+    dy = y2 - y1
+
+    rads = atan2(-dy,dx)
+    rads %= 2*pi
+
+    degs = degrees(rads)
+
+    return degs
+
+class Animal:
+    def __init__(self, x, y, animal_color, \
+                 health, satiety, speed, phi, \
+                 vision_range, \
+                 group):
+        pg.sprite.Sprite.__init__(self)
+        self.image = pg.Surface((10, 10))
+        self.image.fill(animal_color)
+        self.rect = self.image.get_rect(center = (x, y))
+
+        self.health = health    #at the start this is full
+        self.max_health = health
+        self.satiety = satiety
+        self.speed = speed
+        self.phi = to_radians(phi)
+    
+        self.vision_surf = pg.Surface((self.image.get_width() + 50, self.image.get_height() + 50))
+        self.vision = self.vision_surf.get_rect(center = self.rect.center)
+        #s_vision = pg.Rect((s_rect.center), (s.get_width() + 100, s.get_height() + 100))
+        self.vision_surf.fill(vision_color)
+
+        #self.moves = 0  #dfgdf
+        self.is_hungry = False
+        self.is_run = True #only in preys
+
+        self.add(group)
+
+    def minus_satiety(self, value = 5):
+        if self.satiety == 0:
+            self.is_hungry = True
+        else:
+            if self.satiety - value >= 0:
+                self.satiety -= value
+            else:
+                self.satiety = 0
+
+    def add_satiety(self, value = 5):   #can improve
+        if self.satiety == max_satiety:
+            pass
+        else:
+            if self.satiety + value <= max_satiety:
+                self.satiety += value
+            else:
+                self.satiety = max_satiety
+
+    def minus_health(self, value = 5):
+        if self.health == 0:
+            self.kill()
+        else:
+            if self.health - value >= 0:
+                self.satiety -= value
+            else:
+                self.satiety = 0
+
+    def add_health(self, value = 5):
+        if self.health == max_health:
+            pass
+        else:
+            if self.health + value <= max_health:
+                self.helth += value
+            else:
+                self.helth = max_helth
+
+    def is_hungry(self):
+        if self.is_hungry:
+          self.minus_health()
+
+    def run_to_it(self, object):
+        self.phi = find_angel(self.rect.x, self.rect.y,
+                              object.rect.x, object.rect.y)
+
+    def run_from_it(self, object):
+        if is_run:  #sdfsdf
+            self.phi = to_radians(to_degrees(object.phi) + 180)           
+
+##    def walk(self):
+##        if self.moves == 0:
+##            self.moves = randint(1, 11)
+##            self.phi = to_radians(randint(0, 360))
+##        else:
+##            self.moves -= 1
+
+#create predator group
+    def update(self, *args):
+        if self.rect.top <= 0:
+            if self.phi > to_radians(90):
+                self.phi += (2 * (to_radians(180) - self.phi))
+            elif self.phi == to_radians(90):
+                self.phi = to_radians(270)          
+            elif self.phi < to_radians(90):
+                self.phi = (to_radians(360) - self.phi)
+
+        if self.rect.right >= args[1]:
+            if self.phi > to_radians(0):
+                self.phi = (to_radians(180) - self.phi) 
+            elif self.phi == to_radians(0):
+                self.phi = to_radians(180)         
+            elif self.phi < to_radians(0):
+                #self.phi = (to_radians(540) - self.phi) #540
+                self.phi = to_radians(200)
+            
+        if self.rect.bottom >= args[0]:
+            if self.phi > to_radians(270):
+                self.phi = (to_radians(360) - self.phi)
+            elif self.phi == to_radians(270):
+                self.phi = to_radians(90)          
+            elif self.phi < to_radians(270):
+                self.phi = (to_radians(360) - self.phi) ########
+
+        if self.rect.left <= 0:
+            if self.phi > to_radians(180):
+                self.phi = (to_radians(540) - self.phi)
+            elif self.phi == to_radians(180):
+                self.phi = to_radians(0)          
+            elif self.phi < to_radians(180):
+                self.phi = (to_radians(180) - self.phi)
+        
+        
+        delta_x = int(self.speed * (math.cos(self.phi)))
+        delta_y = int(self.speed * (math.sin(self.phi)))
+        
+        if 0 <= self.phi < 90:
+            self.rect.x += delta_x #+
+            self.rect.y -= delta_y #-
+        elif 90 <= self.phi < 180:
+            self.rect.x -= delta_x #-
+            self.rect.y -= delta_y #-
+        elif 180 <= self.phi < 270:
+            self.rect.x -= delta_x #-
+            self.rect.y += delta_y #+
+        elif 270 <= self.phi < 360:
+            self.rect.x += delta_x #+
+            self.rect.y += delta_y #+
+
+        self.vision.center = self.rect.center
+
+class Prey(Animal):
+    object = None
+    
+    def check(self):
+        if self.see_predator(self.rect):
+            self.run_from_it(self.object)
+        elif self.see_partner(self.rect, self.get_group()):
+            self.run_to_it(self.object)
+            is_run = False
+        elif self.see_plant(self.rect):
+            self.run_to_it(self.object)
+            is_run = False
+        else:
+            #self.walk()
+            pass
+
+    def see_predator(self, prey):
+        for predator in predators:
+            if prey.collide_rect(predator.rect):
+                self.object = predator
+                return True
+
+    def see_partner(self, prey, same_group):
+        for same in same_group:
+            if prey.collide_rect(same.rect):
+                self.object = same
+                return True
+
+    def see_plant(self, prey):
+        for plant in plants:
+            if prey.collide_rect(plant.rect):
+                self.object = plant
+                return True
+
+class Predator(Animal):
+    object = None
+    
+    def check(self):
+        if self.see_partner(self.rect, self.get_group()):
+            run_to_it(self.object)
+        elif self.see_pray(self.rect):
+            run_to_it(self.object)
+        else:
+            #self.walk()
+            pass
+
+    def see_partner(self, predator, same_group):
+        for same in same_group:
+            if predator.collide_rect(same.rect):
+                self.object = same
+                return True
+
+    def see_pray(self, predator):
+        for prey in preys:
+            if predator.collide_rect(prey.rect):
+                self.object = prey
+                return True
+
+class Fox(Predator):
+    def __init__(self, x, y, animal_color, \
+                 health, satiety, speed, phi, \
+                 vision_range, \
+                 group):
+        super(x, y, animal_color, health, satiety, speed, phi, vision_range, group)
   
-  def ready_to_reproduce(self):
-    if self.health > 90:
-      if random.random() > 0.5:
-        new_fox = Fox(100)
-        Animals.append(new_fox)
-  
-  def is_hungry(self):
-    if self.satiety == 0:
-      self.health -= 2
 
-  def get_info(self):
-    print(f"This fox: {self.health}, {self.satiety}")
+class Rabbit(Prey):
+    def __init__(self, x, y, animal_color, \
+                 health, satiety, speed, phi, \
+                 vision_range, \
+                 group):
+        super(x, y, animal_color, health, satiety, speed, phi, vision_range, group)
 
-class Rabbit:
-  def __init__(self, health: int, satiety: int, genetic: int):
-    self.health = health + genetic * 10
-    self.satiety = satiety + genetic * 10
 
-  def ready_to_reproduce(self):
-    if self.health > 90:
-      if random.random() > 0.5:
-        new_rabbit = Rabbit(100)
-        Animals.append(new_rabbit)
+class Wolf(Predator):
+    def __init__(self, x, y, animal_color, \
+                 health, satiety, speed, phi, \
+                 vision_range, \
+                 group):
+        super(x, y, animal_color, health, satiety, speed, phi, vision_range, group)
 
-  def is_hungry(self):
-    if self.satiety == 0:
-      self.health -= 2      
 
-  def get_info(self):
-    print(f"This rabbit: {self.health}, {self.satiety}")
+class Bird(Prey):
+    def __init__(self, x, y, animal_color, \
+                 health, satiety, speed, phi, \
+                 vision_range, \
+                 group):
+        super(x, y, animal_color, health, satiety, speed, phi, vision_range, group)
 
-class Plant:
-  def __init__(self, maturity: int, has_thorns: bool):
-    self.maturity = maturity
-    self.has_thorns = has_thorns
-
-Animals = []
-Animals.append(Fox(100, 100, 2))
-Animals.append(Rabbit(100, 80, 1))
-Animals.append(Rabbit(70, 100, 2))
-Animals.append(Fox(100, 100, 1))
-Animals.append(Fox(100, 80, 1))
-Animals.append(Rabbit(90, 100, 3))
-Animals.append(Fox(100, 100, 1))
-
-for i in Animals:
-  print(i.get_info())
-print(len(Animals))
