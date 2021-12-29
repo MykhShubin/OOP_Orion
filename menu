@@ -1,4 +1,4 @@
-def one():#будущие фунции
+def one():#будущие  фунции
     print("one")
 
 def two():
